@@ -1,8 +1,18 @@
+// webpack.common.js
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 const dotenv = require('dotenv');
+
+// Load environment variables from .env file
+const env = dotenv.config().parsed || {};
+
+// Reduce environment variables to a format that can be used with webpack.DefinePlugin
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
 
 module.exports = {
   entry: {
@@ -32,5 +42,6 @@ module.exports = {
         },
       ],
     }),
+    new webpack.DefinePlugin(envKeys),
   ],
 };
