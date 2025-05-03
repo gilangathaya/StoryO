@@ -1,6 +1,6 @@
 // src/scripts/pages/home/home-page.js
 import StoryAPI from '../../data/api';
-import { showFormattedDate } from '../../utils';
+import { showFormattedDate, sleep } from '../../utils'; // Properly import sleep
 import { showLoading, hideLoading } from '../../utils/loading-utils';
 
 export default class HomePage {
@@ -28,7 +28,7 @@ export default class HomePage {
     await this.#fetchStories();
     this.#renderStories();
     this.#initEventListeners();
-    await sleep(300); // Wait for DOM to be ready
+    await sleep(300); // Now sleep is properly imported
     this.#initMap();
   }
 
@@ -166,9 +166,4 @@ export default class HomePage {
     const storiesContainer = document.getElementById('stories');
     storiesContainer.innerHTML = `<p class="error-message">Error: ${message}</p>`;
   }
-}
-
-// Helper function for sleep
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }

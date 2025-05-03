@@ -1,6 +1,6 @@
 import HomePage from '../pages/home/home-page';
 import DetailPage from '../pages/detail/detail-page';
-import AddStoryPage from '../pages/add/add-story-page';
+import AddStoryPage from '../pages/add/add-story-pages';
 import AboutPage from '../pages/about/about-page';
 import { parseActivePathname } from './url-parser';
 

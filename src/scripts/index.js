@@ -1,22 +1,12 @@
-// CSS imports
-import '../styles/styles.css';
-
-// JS imports
-import App from './pages/app';
-import loadEnvironmentVariables from './utils/env-loader';
-
-// Load environment variables
-loadEnvironmentVariables();
-
-document.addEventListener('DOMContentLoaded', async () => {
-  const app = new App({
-    content: document.querySelector('#main-content'),
-    drawerButton: document.querySelector('#drawer-button'),
-    navigationDrawer: document.querySelector('#navigation-drawer'),
+export function showFormattedDate(date, locale = 'en-US', options = {}) {
+  return new Date(date).toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    ...options,
   });
-  await app.renderPage();
+}
 
-  window.addEventListener('hashchange', async () => {
-    await app.renderPage();
-  });
-});
+export function sleep(time = 1000) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
