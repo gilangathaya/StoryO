@@ -2,6 +2,7 @@
 import StoryAPI from '../../data/api';
 import { showFormattedDate, sleep } from '../../utils'; // Properly import sleep
 import { showLoading, hideLoading } from '../../utils/loading-utils';
+import L from 'leaflet';
 
 export default class HomePage {
   constructor() {
@@ -16,10 +17,6 @@ export default class HomePage {
         <div id="stories" class="story-list">
           <p>Memuat data...</p>
         </div>
-        <div class="map-container">
-          <h2>Peta Lokasi Cerita</h2>
-          <div id="stories-map"></div>
-        </div>
       </section>
     `;
   }
@@ -28,8 +25,6 @@ export default class HomePage {
     await this.#fetchStories();
     this.#renderStories();
     this.#initEventListeners();
-    await sleep(300); // Now sleep is properly imported
-    this.#initMap();
   }
 
   async #fetchStories() {
@@ -51,65 +46,6 @@ export default class HomePage {
     }
   }
 
-  #initMap() {
-    try {
-      const mapContainer = document.getElementById('stories-map');
-      if (!mapContainer) return;
-      
-      // Create map with default view of Indonesia
-      this.map = L.map('stories-map').setView([-2.5489, 118.0149], 4);
-      
-      // Add tile layer
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      }).addTo(this.map);
-      
-      // Add markers for stories with location
-      this.#addStoryMarkers();
-    } catch (error) {
-      console.error('Error initializing map:', error);
-      const mapContainer = document.getElementById('stories-map');
-      if (mapContainer) {
-        mapContainer.innerHTML = '<p>Gagal memuat peta</p>';
-      }
-    }
-  }
-
-  #addStoryMarkers() {
-    if (!this.map || !this.stories.length) return;
-    
-    // Create a bounds object to fit all markers
-    const bounds = L.latLngBounds();
-    let hasMarkers = false;
-    
-    this.stories.forEach(story => {
-      if (story.lat && story.lon) {
-        // Create marker
-        const marker = L.marker([story.lat, story.lon]).addTo(this.map);
-        
-        // Add popup with story info
-        marker.bindPopup(`
-          <div class="popup-content">
-            <h3>${story.name}</h3>
-            <img src="${story.photoUrl}" alt="Foto cerita dari ${story.name}" style="width:100%;max-height:150px;object-fit:cover;margin-bottom:8px;">
-            <p>${story.description.substring(0, 100)}${story.description.length > 100 ? '...' : ''}</p>
-            <a href="#/detail/${story.id}" class="popup-link">Lihat Detail</a>
-          </div>
-        `);
-        
-        // Extend bounds
-        bounds.extend([story.lat, story.lon]);
-        hasMarkers = true;
-      }
-    });
-    
-    // Fit map to show all markers if any exist
-    if (hasMarkers) {
-      this.map.fitBounds(bounds, { padding: [50, 50] });
-    }
-  }
-
   #renderStories() {
     const storiesContainer = document.getElementById('stories');
     
@@ -118,48 +54,63 @@ export default class HomePage {
       return;
     }
     
-    storiesContainer.innerHTML = this.stories.map((story) => `
-      <article class="story-item" data-id="${story.id}">
-        <div class="story-image-container">
-          <img class="story-image" src="${story.photoUrl}" alt="Foto cerita dari ${story.name}" loading="lazy">
-        </div>
-        <div class="story-content">
-          <h2 class="story-name">${story.name}</h2>
-          <p class="story-description">${story.description}</p>
-          <time class="story-date" datetime="${story.createdAt}">
-            ${showFormattedDate(story.createdAt, 'id-ID')}
-          </time>
-          ${story.lat && story.lon ? `
-            <p class="story-location">
-              <small>Lokasi: ${story.lat.toFixed(4)}, ${story.lon.toFixed(4)}</small>
-            </p>
-          ` : ''}
-        </div>
-      </article>
-    `).join('');
+    storiesContainer.innerHTML = this.stories.map((story, idx) => {
+      const dateTime = new Date(story.createdAt).toLocaleString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      return `
+        <article class="story-item" data-id="${story.id}">
+          <div class="story-image-container">
+            <img class="story-image" src="${story.photoUrl}" alt="Foto cerita dari ${story.name}" loading="lazy">
+          </div>
+          <div class="story-content">
+            <h2 class="story-name">${story.name}</h2>
+            ${story.lat && story.lon ? `
+              <div class="story-card-location-text">
+                <small>Lokasi: ${story.lat.toFixed(4)}, ${story.lon.toFixed(4)}</small>
+              </div>
+            ` : ''}
+            <p class="story-description">${story.description}</p>
+            <time class="story-date" datetime="${story.createdAt}">
+              ${dateTime}
+            </time>
+            ${story.lat && story.lon ? `
+              <div class="story-card-map-container">
+                <div id="story-card-map-${idx}" class="story-card-map"></div>
+              </div>
+            ` : ''}
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    // Initialize maps for each story card with location
+    this.stories.forEach((story, idx) => {
+      if (story.lat && story.lon) {
+        setTimeout(() => {
+          const map = L.map(`story-card-map-${idx}`, {
+            attributionControl: false,
+            zoomControl: false,
+            dragging: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            keyboard: false,
+            tap: false,
+          }).setView([story.lat, story.lon], 13);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+          L.marker([story.lat, story.lon]).addTo(map);
+        }, 0);
+      }
+    });
   }
 
   #initEventListeners() {
-    const storyItems = document.querySelectorAll('.story-item');
-    storyItems.forEach((item) => {
-      item.addEventListener('click', (event) => {
-        const storyId = event.currentTarget.dataset.id;
-        window.location.hash = `#/detail/${storyId}`;
-      });
-      
-      // Make entire card keyboard accessible
-      item.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          const storyId = event.currentTarget.dataset.id;
-          window.location.hash = `#/detail/${storyId}`;
-        }
-      });
-      
-      item.setAttribute('tabindex', '0');
-      item.setAttribute('role', 'link');
-      item.setAttribute('aria-label', `Lihat detail cerita dari ${item.querySelector('.story-name').textContent}`);
-    });
+    // Remove all click and keyboard event listeners to disable card navigation
   }
 
   #showErrorMessage(message) {

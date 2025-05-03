@@ -1,4 +1,5 @@
 import CONFIG from '../config';
+import AuthService from './auth-service';
 
 const ENDPOINTS = {
   REGISTER: `${CONFIG.BASE_URL}/register`,
@@ -9,9 +10,19 @@ const ENDPOINTS = {
 };
 
 class StoryAPI {
+  static #getAuthHeaders() {
+    const token = AuthService.getToken();
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+  }
+
   static async getStories() {
     try {
-      const response = await fetch(`${ENDPOINTS.GET_STORIES}?location=1`);
+      const response = await fetch(`${ENDPOINTS.GET_STORIES}?location=1`, {
+        headers: this.#getAuthHeaders()
+      });
       const responseJson = await response.json();
       
       if (responseJson.error) {
@@ -26,7 +37,9 @@ class StoryAPI {
 
   static async getStoryDetail(id) {
     try {
-      const response = await fetch(ENDPOINTS.GET_STORY_DETAIL(id));
+      const response = await fetch(ENDPOINTS.GET_STORY_DETAIL(id), {
+        headers: this.#getAuthHeaders()
+      });
       const responseJson = await response.json();
       
       if (responseJson.error) {
@@ -52,6 +65,9 @@ class StoryAPI {
 
       const response = await fetch(ENDPOINTS.ADD_STORY, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${AuthService.getToken()}`
+        },
         body: formData,
       });
 

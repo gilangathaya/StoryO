@@ -1,6 +1,7 @@
 // src/scripts/index.js
 import '../styles/styles.css';
 import App from './pages/app';
+import AuthService from './data/auth-service';
 import loadEnvironmentVariables from './utils/env-loader';
 
 // Load environment variables
@@ -13,15 +14,40 @@ const app = new App({
   content: document.getElementById('main-content'),
 });
 
-// Render the initial page
+// Update auth UI based on login state
+function updateAuthUI() {
+  const isLoggedIn = AuthService.isLoggedIn();
+  const loginLink = document.getElementById('login-link');
+  const registerLink = document.getElementById('register-link');
+  const logoutLink = document.getElementById('logout-link');
+
+  if (isLoggedIn) {
+    loginLink.style.display = 'none';
+    registerLink.style.display = 'none';
+    logoutLink.style.display = 'inline';
+  } else {
+    loginLink.style.display = 'inline';
+    registerLink.style.display = 'inline';
+    logoutLink.style.display = 'none';
+  }
+}
+
+// Setup logout handler
+document.getElementById('logout-link')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  AuthService.logout();
+  updateAuthUI();
+  window.location.hash = '#/';
+});
+
+// Render the initial page and update auth UI
 window.addEventListener('DOMContentLoaded', () => {
+  updateAuthUI();
   app.renderPage();
 });
 
-// Handle hash change events for navigation
-window.addEventListener('hashchange', () => {
-  app.renderPage();
-});
+// Update auth UI on hash changes
+window.addEventListener('hashchange', updateAuthUI);
 
 // Export utility functions (keeping the original exports)
 export function showFormattedDate(date, locale = 'en-US', options = {}) {
