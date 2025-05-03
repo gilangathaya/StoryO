@@ -1,7 +1,12 @@
 // CSS imports
 import '../styles/styles.css';
 
+// JS imports
 import App from './pages/app';
+import loadEnvironmentVariables from './utils/env-loader';
+
+// Load environment variables
+loadEnvironmentVariables();
 
 document.addEventListener('DOMContentLoaded', async () => {
   const app = new App({

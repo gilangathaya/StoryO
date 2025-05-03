@@ -1,5 +1,6 @@
 import routes from '../routes/routes';
-import { getActiveRoute } from '../routes/url-parser';
+import { getActiveRoute, parseActivePathname } from '../routes/url-parser';
+import { applyViewTransition } from '../utils/view-transitions';
 
 class App {
   #content = null;
@@ -34,10 +35,28 @@ class App {
 
   async renderPage() {
     const url = getActiveRoute();
-    const page = routes[url];
+    const urlSegments = parseActivePathname();
+    
+    let page;
+    
+    // Check if the route has a parameter
+    if (url.includes(':id') && urlSegments.id) {
+      const routeFunction = routes[url];
+      if (typeof routeFunction === 'function') {
+        page = routeFunction(urlSegments.id);
+      } else {
+        // Fallback to home if route function is not found
+        page = routes['/'];
+      }
+    } else {
+      page = routes[url] || routes['/'];
+    }
 
-    this.#content.innerHTML = await page.render();
-    await page.afterRender();
+    // Use View Transitions API if available
+    await applyViewTransition(async () => {
+      this.#content.innerHTML = await page.render();
+      await page.afterRender();
+    });
   }
 }
 
