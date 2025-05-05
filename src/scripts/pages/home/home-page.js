@@ -94,16 +94,24 @@ export default class HomePage {
         setTimeout(() => {
           const map = L.map(`story-card-map-${idx}`, {
             attributionControl: false,
-            zoomControl: false,
-            dragging: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            boxZoom: false,
-            keyboard: false,
-            tap: false,
+            zoomControl: true,
+            dragging: true,
+            scrollWheelZoom: true,
+            doubleClickZoom: true,
+            boxZoom: true,
+            keyboard: true,
+            tap: true,
           }).setView([story.lat, story.lon], 13);
+          
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-          L.marker([story.lat, story.lon]).addTo(map);
+          
+          const marker = L.marker([story.lat, story.lon]).addTo(map);
+          marker.bindPopup(`<b>Lokasi</b><br>Lat: ${story.lat.toFixed(6)}<br>Lon: ${story.lon.toFixed(6)}`);
+          
+          // Add click event to marker
+          marker.on('click', () => {
+            marker.openPopup();
+          });
         }, 0);
       }
     });
