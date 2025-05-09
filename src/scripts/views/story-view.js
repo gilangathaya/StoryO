@@ -6,15 +6,16 @@ class StoryView {
     console.log('StoryView initialized');
   }
 
-  displayStories(response) {
-    if (response.error) {
-      console.error('Error displaying stories:', response.message);
+  bindMapMarkerClick(callback) {
+    this.onMapMarkerClick = callback;
+  }
+
+  displayStories(stories) {
+    if (!stories || stories.length === 0) {
+      this.storyList.innerHTML = '<p>No stories available</p>';
       return;
     }
 
-    const stories = response.data;
-    console.log('Displaying stories:', stories);
-    
     this.storyList.innerHTML = stories.map(story => `
       <div class="story-card" data-id="${story.id}">
         <h3>${story.name}</h3>
@@ -27,11 +28,8 @@ class StoryView {
 
     // Initialize maps for each story
     stories.forEach(story => {
-      console.log('Initializing map for story:', story);
       if (story.lat && story.lon) {
         this.initMap(story.id, story.lat, story.lon);
-      } else {
-        console.warn('Story missing coordinates:', story);
       }
     });
   }
@@ -56,18 +54,16 @@ class StoryView {
 
     const marker = L.marker([lat, lon]).addTo(map);
     marker.bindPopup(`<b>Lokasi</b><br>Lat: ${lat}<br>Lon: ${lon}`);
+    marker.on('click', () => this.onMapMarkerClick(storyId));
 
     this.maps.set(storyId, { map, marker });
   }
 
-  displayStoryDetail(response) {
-    if (response.error) {
-      console.error('Error displaying story detail:', response.message);
+  displayStoryDetail(story) {
+    if (!story) {
+      this.storyDetail.innerHTML = '<p>Story not found</p>';
       return;
     }
-
-    const story = response.data;
-    console.log('Displaying story detail:', story);
     
     this.storyDetail.innerHTML = `
       <h2>${story.name}</h2>
@@ -80,6 +76,12 @@ class StoryView {
     if (story.lat && story.lon) {
       this.initMap('detail', story.lat, story.lon);
     }
+  }
+
+  showError(message) {
+    const errorMessage = `<div class="error-message">${message}</div>`;
+    this.storyList.innerHTML = errorMessage;
+    this.storyDetail.innerHTML = errorMessage;
   }
 }
 
