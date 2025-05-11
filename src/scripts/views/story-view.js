@@ -1,5 +1,8 @@
-class StoryView {
+import BaseView from './base-view';
+
+class StoryView extends BaseView {
   constructor() {
+    super();
     this.storyList = document.getElementById('storyList');
     this.storyDetail = document.getElementById('storyDetail');
     this.maps = new Map(); // Store map instances
@@ -82,6 +85,13 @@ class StoryView {
     const errorMessage = `<div class="error-message">${message}</div>`;
     this.storyList.innerHTML = errorMessage;
     this.storyDetail.innerHTML = errorMessage;
+  }
+
+  render() {
+    return `
+      <div id="storyList"></div>
+      <div id="storyDetail"></div>
+    `;
   }
 }
 

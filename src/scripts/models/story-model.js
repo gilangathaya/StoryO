@@ -18,6 +18,15 @@ class StoryModel {
       return { error: true, message: 'Failed to fetch story detail' };
     }
   }
+
+  async addStory(storyData) {
+    try {
+      const response = await StoryAPI.addStory(storyData);
+      return response;
+    } catch (error) {
+      return { error: true, message: 'Failed to add story' };
+    }
+  }
 }
 
 export default StoryModel; 

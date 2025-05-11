@@ -1,22 +1,22 @@
-import HomePage from '../pages/home/home-page';
+import Home from '../pages/home';
 import DetailPage from '../pages/detail/detail-page';
 import AddStoryPage from '../pages/add/add-story-pages';
-import AboutPage from '../pages/about/about-page';
+import About from '../pages/about/about-page';
 import LoginPage from '../pages/auth/login-page';
 import RegisterPage from '../pages/auth/register-page';
 import AuthService from '../data/auth-service';
 import { parseActivePathname } from './url-parser';
 
 const routes = {
-  '/': new HomePage(),
-  '/detail/:id': (id) => new DetailPage(id),
+  '/': Home,
+  '/detail/:id': DetailPage,
   '/add': {
-    page: new AddStoryPage(),
+    page: AddStoryPage,
     requiresAuth: true
   },
-  '/about': new AboutPage(),
-  '/login': new LoginPage(),
-  '/register': new RegisterPage()
+  '/about': About,
+  '/login': LoginPage,
+  '/register': RegisterPage
 };
 
 export function getRoute(path) {

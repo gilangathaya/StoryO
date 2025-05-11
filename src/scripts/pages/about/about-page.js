@@ -1,4 +1,4 @@
-export default class AboutPage {
+const About = {
   async render() {
     return `
       <section class="container">
@@ -37,9 +37,10 @@ export default class AboutPage {
         </div>
       </section>
     `;
-  }
-
+  },
   async afterRender() {
     // No additional setup needed for about page
   }
-}
+};
+
+export default About;

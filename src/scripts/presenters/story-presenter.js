@@ -1,11 +1,9 @@
-import StoryModel from '../models/story-model';
-import StoryView from '../views/story-view';
+import BasePresenter from './base-presenter';
 import { showLoading, hideLoading } from '../utils/loading-utils';
 
-class StoryPresenter {
+class StoryPresenter extends BasePresenter {
   constructor(model, view) {
-    this.model = model;
-    this.view = view;
+    super(model, view);
     this.view.bindMapMarkerClick(this.handleMapMarkerClick.bind(this));
   }
 
@@ -16,14 +14,14 @@ class StoryPresenter {
       hideLoading();
       
       if (response.error) {
-        this.view.showError(response.message);
+        this.showError(response.message);
         return;
       }
       
       this.view.displayStories(response.data);
     } catch (error) {
       hideLoading();
-      this.view.showError('Failed to load stories');
+      this.showError('Failed to load stories');
       console.error('Error initializing stories:', error);
     }
   }
@@ -35,14 +33,14 @@ class StoryPresenter {
       hideLoading();
       
       if (response.error) {
-        this.view.showError(response.message);
+        this.showError(response.message);
         return;
       }
       
       this.view.displayStoryDetail(response.data);
     } catch (error) {
       hideLoading();
-      this.view.showError('Failed to load story detail');
+      this.showError('Failed to load story detail');
       console.error('Error loading story detail:', error);
     }
   }
