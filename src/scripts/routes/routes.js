@@ -1,4 +1,4 @@
-import Home from '../pages/home';
+import Home from '../pages/home/home-page';
 import DetailPage from '../pages/detail/detail-page';
 import AddStoryPage from '../pages/add/add-story-pages';
 import About from '../pages/about/about-page';

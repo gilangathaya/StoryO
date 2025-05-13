@@ -18,7 +18,7 @@ class HomeView extends BaseView {
     `;
   }
 
-  displayStories(stories) {
+  showStories(stories) {
     const storiesContainer = document.getElementById('stories');
     if (!stories || stories.length === 0) {
       storiesContainer.innerHTML = '<p>Tidak ada cerita yang tersedia</p>';
@@ -98,7 +98,7 @@ class HomeView extends BaseView {
     });
   }
 
-  showError(message) {
+  showErrorMessage(message) {
     const storiesContainer = document.getElementById('stories');
     storiesContainer.innerHTML = `<p class="error-message">Error: ${message}</p>`;
   }

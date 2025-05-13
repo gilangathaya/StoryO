@@ -1,13 +1,11 @@
 // src/scripts/pages/home/home-page.js
-import StoryAPI from '../../data/api';
-import { showFormattedDate, sleep } from '../../utils'; // Properly import sleep
-import { showLoading, hideLoading } from '../../utils/loading-utils';
+import { showFormattedDate } from '../../utils';
 import L from 'leaflet';
+import HomePresenter from '../../presenters/home-presenter';
 
-export default class HomePage {
+class HomePage {
   constructor() {
-    this.stories = [];
-    this.map = null;
+    this.presenter = new HomePresenter(this);
   }
 
   async render() {
@@ -22,39 +20,21 @@ export default class HomePage {
   }
 
   async afterRender() {
-    await this.#fetchStories();
-    this.#renderStories();
+    console.log('afterRender called');
+    await this.presenter.getStories();
     this.#initEventListeners();
   }
 
-  async #fetchStories() {
-    try {
-      showLoading();
-      const response = await StoryAPI.getStories();
-      hideLoading();
-      
-      if (response.error) {
-        this.#showErrorMessage(response.message);
-        return;
-      }
-      
-      this.stories = response.data;
-    } catch (error) {
-      hideLoading();
-      this.#showErrorMessage('Gagal memuat data cerita');
-      console.error(error);
-    }
-  }
-
-  #renderStories() {
+  showStories(stories) {
+    console.log('showStories called with:', stories);
     const storiesContainer = document.getElementById('stories');
     
-    if (this.stories.length === 0) {
+    if (stories.length === 0) {
       storiesContainer.innerHTML = '<p>Tidak ada cerita yang tersedia</p>';
       return;
     }
     
-    storiesContainer.innerHTML = this.stories.map((story, idx) => {
+    storiesContainer.innerHTML = stories.map((story, idx) => {
       const dateTime = new Date(story.createdAt).toLocaleString('id-ID', {
         year: 'numeric',
         month: 'long',
@@ -89,7 +69,7 @@ export default class HomePage {
     }).join('');
 
     // Initialize maps for each story card with location
-    this.stories.forEach((story, idx) => {
+    stories.forEach((story, idx) => {
       if (story.lat && story.lon) {
         setTimeout(() => {
           const map = L.map(`story-card-map-${idx}`, {
@@ -121,8 +101,11 @@ export default class HomePage {
     // Remove all click and keyboard event listeners to disable card navigation
   }
 
-  #showErrorMessage(message) {
+  showErrorMessage(message) {
+    console.log('showErrorMessage called with:', message);
     const storiesContainer = document.getElementById('stories');
     storiesContainer.innerHTML = `<p class="error-message">Error: ${message}</p>`;
   }
 }
+
+export default new HomePage();

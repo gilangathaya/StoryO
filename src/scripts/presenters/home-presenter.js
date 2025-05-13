@@ -1,28 +1,33 @@
-import BasePresenter from './base-presenter';
+import StoryAPI from '../data/api';
 import { showLoading, hideLoading } from '../utils/loading-utils';
 
-class HomePresenter extends BasePresenter {
-  constructor(model, view) {
-    super(model, view);
-    this.init();
+export default class HomePresenter {
+  constructor(view) {
+    this._view = view;
+    this._stories = [];
   }
 
-  async init() {
+  async getStories() {
     try {
       showLoading();
-      const response = await this.model.getStories();
+      const response = await StoryAPI.getStories();
       hideLoading();
+      
       if (response.error) {
-        this.showError(response.message);
+        this._view.showErrorMessage(response.message);
         return;
       }
-      this.view.displayStories(response.data);
+      
+      this._stories = response.data;
+      this._view.showStories(this._stories);
     } catch (error) {
       hideLoading();
-      this.showError('Gagal memuat data cerita');
+      this._view.showErrorMessage('Gagal memuat data cerita');
       console.error(error);
     }
   }
-}
 
-export default HomePresenter; 
+  getStoriesData() {
+    return this._stories;
+  }
+} 
