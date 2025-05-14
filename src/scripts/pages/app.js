@@ -6,6 +6,7 @@ class App {
   #content = null;
   #navigationDrawer = null;
   #drawerButton = null;
+  #currentPage = null;
 
   constructor({ navigationDrawer, drawerButton, content }) {
     this.#navigationDrawer = navigationDrawer;
@@ -14,6 +15,7 @@ class App {
 
     this.#setupNavigation();
     this.#setupHashChange();
+    this.#setupSkipLink();
   }
 
   #setupNavigation() {
@@ -36,6 +38,18 @@ class App {
     });
   }
 
+  #setupSkipLink() {
+    const mainContent = document.querySelector('#main-content');
+    const skipLink = document.querySelector('.skip-link');
+
+    skipLink.addEventListener('click', function (event) {
+      event.preventDefault(); // Mencegah refresh halaman
+      skipLink.blur(); // Menghilangkan fokus skip to content
+      mainContent.focus(); // Fokus ke konten utama
+      mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' }); // Halaman scroll ke konten utama
+    });
+  }
+
   async renderPage() {
     try {
       const url = getActiveRoute();
@@ -43,11 +57,17 @@ class App {
 
       if (!page) return; // Route was redirected to login
 
+      // Cleanup previous page if it exists
+      if (this.#currentPage && typeof this.#currentPage.cleanup === 'function') {
+        this.#currentPage.cleanup();
+      }
+
       // Use View Transitions API if available
       await applyViewTransition(async () => {
         try {
           this.#content.innerHTML = await page.render();
           await page.afterRender();
+          this.#currentPage = page;
         } catch (error) {
           console.error('Error rendering page:', error);
           this.#content.innerHTML = `<div class="container">

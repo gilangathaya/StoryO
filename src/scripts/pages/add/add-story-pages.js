@@ -19,6 +19,12 @@ const AddStoryPage = {
     const model = new StoryModel();
     new AddStoryPresenter(model, view);
     await view.initMap?.(); // If needed, ensure map is initialized
+  },
+
+  cleanup() {
+    if (view) {
+      view.cleanup();
+    }
   }
 };
 
