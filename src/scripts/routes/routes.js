@@ -4,6 +4,7 @@ import AddStoryPage from '../pages/add/add-story-pages';
 import About from '../pages/about/about-page';
 import LoginPage from '../pages/auth/login-page';
 import RegisterPage from '../pages/auth/register-page';
+import Archive from '../pages/archive';
 import AuthService from '../data/auth-service';
 import { parseActivePathname } from './url-parser';
 
@@ -16,7 +17,8 @@ const routes = {
   },
   '/about': About,
   '/login': LoginPage,
-  '/register': RegisterPage
+  '/register': RegisterPage,
+  '/archive': Archive
 };
 
 export function getRoute(path) {

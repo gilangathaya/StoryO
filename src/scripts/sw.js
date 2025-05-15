@@ -12,17 +12,17 @@ self.addEventListener('push', function(event) {
     data: {
       dateOfArrival: Date.now(),
       primaryKey: 1,
-      url: data.url
+      url: data.url || '/'
     },
     actions: [
       {
         action: 'explore',
-        title: 'View Story',
+        title: 'Lihat Cerita',
         icon: '/images/icons/checkmark.png'
       },
       {
         action: 'close',
-        title: 'Close',
+        title: 'Tutup',
         icon: '/images/icons/xmark.png'
       }
     ]

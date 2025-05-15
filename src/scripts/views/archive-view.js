@@ -1,37 +1,26 @@
-// src/scripts/pages/home/home-page.js
-import { showFormattedDate } from '../../utils';
-import L from 'leaflet';
-import HomePresenter from '../../presenters/home-presenter';
-import StoriesDB from '../../db';
+import BaseView from './base-view';
 
-class HomePage {
+class ArchiveView extends BaseView {
   constructor() {
-    this.presenter = new HomePresenter(this);
+    super();
   }
 
-  async render() {
+  render() {
     return `
       <section class="container">
-        <h1>Cerita Terbaru</h1>
-        <div id="stories" class="story-list">
+        <h1>Cerita Tersimpan</h1>
+        <div id="archived-stories" class="story-list">
           <p>Memuat data...</p>
         </div>
       </section>
     `;
   }
 
-  async afterRender() {
-    console.log('afterRender called');
-    await this.presenter.getStories();
-    this.#initEventListeners();
-  }
-
-  showStories(stories) {
-    console.log('showStories called with:', stories);
-    const storiesContainer = document.getElementById('stories');
+  showArchivedStories(stories) {
+    const storiesContainer = document.getElementById('archived-stories');
     
-    if (stories.length === 0) {
-      storiesContainer.innerHTML = '<p>Tidak ada cerita yang tersedia</p>';
+    if (!stories || stories.length === 0) {
+      storiesContainer.innerHTML = '<p>Belum ada cerita yang diarsipkan</p>';
       return;
     }
     
@@ -59,8 +48,8 @@ class HomePage {
             <time class="story-date" datetime="${story.createdAt}">
               ${dateTime}
             </time>
-            <button class="archive-button" data-id="${story.id}">
-              Arsipkan
+            <button class="remove-archive-button" data-id="${story.id}">
+              Hapus dari Arsip
             </button>
             ${story.lat && story.lon ? `
               <div class="story-card-map-container">
@@ -92,7 +81,6 @@ class HomePage {
           const marker = L.marker([story.lat, story.lon]).addTo(map);
           marker.bindPopup(`<b>Lokasi</b><br>Lat: ${story.lat.toFixed(6)}<br>Lon: ${story.lon.toFixed(6)}`);
           
-          // Add click event to marker
           marker.on('click', () => {
             marker.openPopup();
           });
@@ -100,50 +88,19 @@ class HomePage {
       }
     });
 
-    // Add click event listeners to archive buttons
-    document.querySelectorAll('.archive-button').forEach(button => {
-      button.addEventListener('click', async (event) => {
-        event.stopPropagation(); // Prevent story card click event
+    // Add click event listeners to remove archive buttons
+    document.querySelectorAll('.remove-archive-button').forEach(button => {
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
         const storyId = button.getAttribute('data-id');
-        const story = stories.find(s => s.id === storyId);
-        
-        if (story) {
-          try {
-            await StoriesDB.putArchivedStory(story);
-            
-            // Show notification
-            if ('serviceWorker' in navigator && 'Notification' in window) {
-              const registration = await navigator.serviceWorker.ready;
-              await registration.showNotification('Cerita Diarsipkan', {
-                body: `Cerita "${story.name}" berhasil diarsipkan`,
-                icon: '/images/icons/icon-72x72.png',
-                badge: '/images/icons/badge-72x72.png',
-                vibrate: [100, 50, 100],
-                data: {
-                  url: '#/archive'
-                }
-              });
-            }
-            
-            alert('Cerita berhasil diarsipkan!');
-          } catch (error) {
-            console.error('Error archiving story:', error);
-            alert('Gagal mengarsipkan cerita');
-          }
-        }
+        this.onRemoveArchive(storyId);
       });
     });
   }
 
-  #initEventListeners() {
-    // Remove all click and keyboard event listeners to disable card navigation
-  }
-
-  showErrorMessage(message) {
-    console.log('showErrorMessage called with:', message);
-    const storiesContainer = document.getElementById('stories');
-    storiesContainer.innerHTML = `<p class="error-message">Error: ${message}</p>`;
+  bindRemoveArchive(callback) {
+    this.onRemoveArchive = callback;
   }
 }
 
-export default new HomePage();
+export default ArchiveView; 

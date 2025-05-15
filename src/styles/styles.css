@@ -239,6 +239,37 @@ header {
   font-size: 0.85rem;
   color: #888;
   display: block;
+  margin-bottom: 12px;
+}
+
+.archive-button,
+.remove-archive-button {
+  display: inline-block;
+  padding: 8px 16px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.archive-button {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.archive-button:hover {
+  background-color: var(--secondary-color);
+}
+
+.remove-archive-button {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.remove-archive-button:hover {
+  background-color: #c0392b;
 }
 
 /* Story Detail */
