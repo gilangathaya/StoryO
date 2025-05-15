@@ -53,19 +53,27 @@ class App {
   async renderPage() {
     try {
       const url = getActiveRoute();
+      console.log('Current URL:', url);
       const page = getRoute(url);
+      console.log('Resolved page:', page);
 
-      if (!page) return; // Route was redirected to login
+      if (!page) {
+        console.log('No page found, might be redirected to login');
+        return;
+      }
 
       // Cleanup previous page if it exists
       if (this.#currentPage && typeof this.#currentPage.cleanup === 'function') {
+        console.log('Cleaning up previous page');
         this.#currentPage.cleanup();
       }
 
       // Use View Transitions API if available
       await applyViewTransition(async () => {
         try {
+          console.log('Rendering page content');
           this.#content.innerHTML = await page.render();
+          console.log('Page rendered, calling afterRender');
           await page.afterRender();
           this.#currentPage = page;
         } catch (error) {
