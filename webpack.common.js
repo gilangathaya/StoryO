@@ -14,6 +14,8 @@ const envKeys = Object.keys(env).reduce((prev, next) => {
   return prev;
 }, {});
 
+envKeys['process.env'] = JSON.stringify(env); // Ensure process.env is always defined
+
 module.exports = {
   entry: {
     app: path.resolve(__dirname, 'src/scripts/index.js'),
