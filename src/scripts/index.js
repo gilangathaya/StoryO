@@ -3,6 +3,7 @@ import '../styles/styles.css';
 import App from './pages/app';
 import AuthService from './data/auth-service';
 import loadEnvironmentVariables from './utils/env-loader';
+import { initializeNotifications } from './notification';
 
 // Load environment variables
 loadEnvironmentVariables();
@@ -14,7 +15,7 @@ const app = new App({
   content: document.getElementById('main-content'),
 });
 
-// Update auth UI based on login state
+// Initialize push notifications when user logs in
 function updateAuthUI() {
   const isLoggedIn = AuthService.isLoggedIn();
   const loginLink = document.getElementById('login-link');
@@ -25,6 +26,8 @@ function updateAuthUI() {
     loginLink.style.display = 'none';
     registerLink.style.display = 'none';
     logoutLink.style.display = 'inline';
+    // Initialize notifications when user logs in
+    initializeNotifications();
   } else {
     loginLink.style.display = 'inline';
     registerLink.style.display = 'inline';

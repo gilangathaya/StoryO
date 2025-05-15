@@ -75,6 +75,8 @@ class AddStoryPresenter extends BasePresenter {
         return;
       }
       
+      // CLEANUP BEFORE NAVIGATION!
+      this.view.cleanup();
       // Show success message and redirect to home
       alert('Cerita berhasil ditambahkan!');
       window.location.hash = '#/';
@@ -83,8 +85,6 @@ class AddStoryPresenter extends BasePresenter {
       hideLoading();
       console.error('Error adding story:', error);
       this.showError('Terjadi kesalahan saat menambahkan cerita. Silakan coba lagi.');
-    } finally {
-      this.view.cleanup();
     }
   }
 }

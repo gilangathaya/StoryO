@@ -24,7 +24,7 @@ class StoryView extends BaseView {
         <h3>${story.name}</h3>
         <p>${story.description}</p>
         <div class="map-container">
-          <div class="map" id="map-${story.id}"></div>
+          <div class="map" id="story-map-${story.id}"></div>
         </div>
       </div>
     `).join('');
@@ -38,7 +38,7 @@ class StoryView extends BaseView {
   }
 
   initMap(storyId, lat, lon) {
-    const mapElement = document.getElementById(`map-${storyId}`);
+    const mapElement = document.getElementById(`story-map-${storyId}`);
     if (!mapElement) return;
 
     // Destroy previous map instance if exists
@@ -72,12 +72,28 @@ class StoryView extends BaseView {
       <h2>${story.name}</h2>
       <p>${story.description}</p>
       <div class="map-container">
-        <div class="map" id="map-detail"></div>
+        <div class="map" id="story-map-detail"></div>
       </div>
     `;
 
     if (story.lat && story.lon) {
-      this.initMap('detail', story.lat, story.lon);
+      // Use a unique ID for detail map
+      const mapElement = document.getElementById('story-map-detail');
+      if (mapElement) {
+        if (mapElement._leaflet_id) {
+          mapElement._leaflet_id = null;
+          mapElement.innerHTML = '';
+        }
+        mapElement.style.height = '300px';
+        const map = L.map(mapElement).setView([story.lat, story.lon], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        const marker = L.marker([story.lat, story.lon]).addTo(map);
+        marker.bindPopup(`<b>Lokasi</b><br>Lat: ${story.lat}<br>Lon: ${story.lon}`);
+        marker.on('click', () => marker.openPopup());
+        this.maps.set('detail', { map, marker });
+      }
     }
   }
 

@@ -46,7 +46,7 @@ class AddStoryView extends BaseView {
             <div class="form-group location-container">
               <label class="location-label">Lokasi</label>
               <p>Klik pada peta untuk menandai lokasi cerita Anda:</p>
-              <div id="location-map"></div>
+              <div id="add-story-map" class="map-container"></div>
               <div class="location-coordinates" id="location-coordinates">
                 Belum ada lokasi yang dipilih
               </div>
@@ -87,25 +87,44 @@ class AddStoryView extends BaseView {
 
   initMap() {
     try {
-      const mapContainer = document.getElementById('location-map');
-      if (!mapContainer) return;
-      
-      this.map = L.map('location-map').setView([-2.5489, 118.0149], 5);
-      
+      const parentContainer = document.getElementById('add-story-map');
+      if (!parentContainer) return;
+
+      // Remove previous map instance if exists
+      if (this.map) {
+        this.map.remove();
+        this.map = null;
+        this.marker = null;
+      }
+
+      // Remove old map container if exists
+      const oldMapDiv = document.getElementById('add-story-map-container');
+      if (oldMapDiv) {
+        oldMapDiv.remove();
+      }
+
+      // Create a new map container
+      const mapDiv = document.createElement('div');
+      mapDiv.id = 'add-story-map-container';
+      mapDiv.style.height = '400px';
+      parentContainer.appendChild(mapDiv);
+
+      this.map = L.map('add-story-map-container').setView([-2.5489, 118.0149], 5);
+
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(this.map);
-      
+
       this.bindMapClick((e) => {
         this.updateMapMarker(e.latlng);
       });
-      
+
     } catch (error) {
       console.error('Error initializing map:', error);
-      const mapContainer = document.getElementById('location-map');
-      if (mapContainer) {
-        mapContainer.innerHTML = '<p>Gagal memuat peta</p>';
+      const parentContainer = document.getElementById('add-story-map');
+      if (parentContainer) {
+        parentContainer.innerHTML = '<p>Gagal memuat peta</p>';
       }
     }
   }
@@ -224,6 +243,14 @@ class AddStoryView extends BaseView {
     this.stopCameraStream();
     if (this.map) {
       this.map.remove();
+      this.map = null;
+      this.marker = null;
+    }
+    // Remove the map container from the DOM
+    const parentContainer = document.getElementById('add-story-map');
+    const oldMapDiv = document.getElementById('add-story-map-container');
+    if (parentContainer && oldMapDiv) {
+      oldMapDiv.remove();
     }
   }
 }
