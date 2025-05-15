@@ -2,7 +2,13 @@ import AuthService from './data/auth-service';
 
 const publicVapidKey = 'BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk'; 
 
-// Initialize service worker and notifications
+// Check if user is subscribed to push notifications
+async function isSubscribed(registration) {
+  const subscription = await registration.pushManager.getSubscription();
+  return !!subscription;
+}
+
+// Initialize service worker only (no auto subscribe)
 async function initializeNotifications() {
   try {
     console.log('Checking service worker support...');
@@ -15,24 +21,6 @@ async function initializeNotifications() {
     const registration = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready; // Wait for activation!
     console.log('Service Worker registered and ready:', registration);
-
-    console.log('Current notification permission:', Notification.permission);
-    
-    // Request notification permission if not already granted
-    if (Notification.permission === 'default') {
-      console.log('Requesting notification permission...');
-      const permission = await Notification.requestPermission();
-      console.log('Notification permission result:', permission);
-      
-      if (permission === 'granted') {
-        await subscribePushNotification(registration);
-      }
-    } else if (Notification.permission === 'granted') {
-      console.log('Notification permission already granted, subscribing...');
-      await subscribePushNotification(registration);
-    } else {
-      console.log('Notification permission denied');
-    }
   } catch (error) {
     console.error('Error initializing notifications:', error);
   }
@@ -44,7 +32,16 @@ async function subscribePushNotification(registration) {
     const existingSubscription = await registration.pushManager.getSubscription();
     if (existingSubscription) {
       console.log('Already subscribed to push notifications.');
-      return;
+      return true;
+    }
+
+    // Request permission if needed
+    if (Notification.permission !== 'granted') {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        console.log('Notification permission denied by user.');
+        return false;
+      }
     }
 
     console.log('Subscribing to push notifications...');
@@ -83,8 +80,10 @@ async function subscribePushNotification(registration) {
     }
 
     console.log('Push notification subscription successful');
+    return true;
   } catch (error) {
     console.error('Push notification subscription failed:', error);
+    return false;
   }
 }
 
@@ -106,9 +105,12 @@ async function unsubscribePushNotification(registration) {
       });
       await subscription.unsubscribe();
       console.log('Unsubscribed from push notifications.');
+      return true;
     }
+    return false;
   } catch (error) {
     console.error('Failed to unsubscribe from push notifications:', error);
+    return false;
   }
 }
 
@@ -134,4 +136,4 @@ window.addEventListener('load', () => {
   initializeNotifications();
 });
 
-export { initializeNotifications, unsubscribePushNotification }; 
+export { initializeNotifications, unsubscribePushNotification, subscribePushNotification, isSubscribed }; 
