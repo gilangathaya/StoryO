@@ -41,7 +41,7 @@ self.addEventListener('push', function(event) {
     data: {
       dateOfArrival: Date.now(),
       primaryKey: 1,
-      url: data.url
+      url: '/'
     },
     actions: [
       {
@@ -67,10 +67,13 @@ self.addEventListener('notificationclick', function(event) {
   console.log('Notification click event:', event);
   event.notification.close();
 
+  // Always open '/'
+  const urlToOpen = '/';
+
   if (event.action === 'explore') {
-    console.log('Opening URL:', event.notification.data.url);
+    console.log('Opening URL:', urlToOpen);
     event.waitUntil(
-      clients.openWindow(event.notification.data.url)
+      clients.openWindow(urlToOpen)
     );
   }
 }); 

@@ -3,7 +3,7 @@ import '../styles/styles.css';
 import App from './pages/app';
 import AuthService from './data/auth-service';
 import loadEnvironmentVariables from './utils/env-loader';
-import { initializeNotifications } from './notification';
+import { initializeNotifications, unsubscribePushNotification } from './notification';
 
 // Load environment variables
 loadEnvironmentVariables();
@@ -36,8 +36,12 @@ function updateAuthUI() {
 }
 
 // Setup logout handler
-document.getElementById('logout-link')?.addEventListener('click', (e) => {
+document.getElementById('logout-link')?.addEventListener('click', async (e) => {
   e.preventDefault();
+  if ('serviceWorker' in navigator) {
+    const registration = await navigator.serviceWorker.ready;
+    await unsubscribePushNotification(registration);
+  }
   AuthService.logout();
   updateAuthUI();
   window.location.hash = '#/';

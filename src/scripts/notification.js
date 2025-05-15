@@ -40,6 +40,13 @@ async function initializeNotifications() {
 
 async function subscribePushNotification(registration) {
   try {
+    // Prevent duplicate subscriptions
+    const existingSubscription = await registration.pushManager.getSubscription();
+    if (existingSubscription) {
+      console.log('Already subscribed to push notifications.');
+      return;
+    }
+
     console.log('Subscribing to push notifications...');
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
@@ -81,6 +88,30 @@ async function subscribePushNotification(registration) {
   }
 }
 
+// Unsubscribe from push notifications
+async function unsubscribePushNotification(registration) {
+  try {
+    const subscription = await registration.pushManager.getSubscription();
+    if (subscription) {
+      const payload = {
+        endpoint: subscription.endpoint
+      };
+      await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
+        method: 'DELETE',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${AuthService.getToken()}`
+        }
+      });
+      await subscription.unsubscribe();
+      console.log('Unsubscribed from push notifications.');
+    }
+  } catch (error) {
+    console.error('Failed to unsubscribe from push notifications:', error);
+  }
+}
+
 // Convert VAPID key to Uint8Array
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -103,4 +134,4 @@ window.addEventListener('load', () => {
   initializeNotifications();
 });
 
-export { initializeNotifications }; 
+export { initializeNotifications, unsubscribePushNotification }; 
