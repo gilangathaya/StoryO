@@ -7,18 +7,16 @@ import RegisterPage from '../pages/auth/register-page';
 import Archive from '../pages/archive';
 import AuthService from '../data/auth-service';
 import { parseActivePathname } from './url-parser';
+import NotFoundPage from '../pages/not-found-page';
 
 const routes = {
-  '/': Home,
-  '/detail/:id': DetailPage,
-  '/add': {
-    page: AddStoryPage,
-    requiresAuth: true
-  },
-  '/about': About,
-  '/login': LoginPage,
-  '/register': RegisterPage,
-  '/archive': Archive
+  '/': { page: Home, requiresAuth: true },
+  '/detail/:id': { page: DetailPage, requiresAuth: true },
+  '/add': { page: AddStoryPage, requiresAuth: true },
+  '/about': { page: About, requiresAuth: true },
+  '/login': { page: LoginPage },
+  '/register': { page: RegisterPage },
+  '/archive': { page: Archive, requiresAuth: true }
 };
 
 export function getRoute(path) {
@@ -39,7 +37,9 @@ export function getRoute(path) {
     return null;
   }
 
-  return route?.page || route || routes['/'];
+  // Return NotFoundPage if route is not found
+  if (!route) return NotFoundPage;
+  return route.page;
 }
 
 export default routes;
