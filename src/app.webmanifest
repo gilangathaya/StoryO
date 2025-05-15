@@ -1,0 +1,29 @@
+{
+  "name": "Story App",
+  "short_name": "StoryApp",
+  "description": "Story App is a modern Progressive Web App (PWA) that allows you to share, discover, and explore stories from people around the world. Enjoy a seamless experience with offline support, fast loading, and the ability to add the app to your home screen. Share your experiences, view interactive maps, and connect with a vibrant community—all from your browser.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4A90E2",
+  "icons": [
+    {
+      "src": "icons/icon-x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+} 
