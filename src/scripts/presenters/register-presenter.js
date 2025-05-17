@@ -27,11 +27,8 @@ class RegisterPresenter extends BasePresenter {
         return;
       }
       
-      // Show success notification
-      alert('Pendaftaran berhasil! Silakan login.');
-      
-      // Redirect to login page
-      window.location.hash = '#/login';
+      // Delegate success message and navigation to the View
+      this.view.showSuccessAndRedirectToLogin('Pendaftaran berhasil! Silakan login.');
       
     } catch (error) {
       hideLoading();

@@ -78,8 +78,11 @@ class AddStoryPresenter extends BasePresenter {
       // CLEANUP BEFORE NAVIGATION!
       this.view.cleanup();
       // Show success message and redirect to home
-      alert('Cerita berhasil ditambahkan!');
-      window.location.hash = '#/';
+      // alert('Cerita berhasil ditambahkan!'); // Removed direct alert
+      // window.location.hash = '#/'; // Removed direct navigation
+      
+      // Delegate success handling and navigation to the View
+      this.view.showSuccessAndRedirect('Cerita berhasil ditambahkan!', '#/');
       
     } catch (error) {
       hideLoading();

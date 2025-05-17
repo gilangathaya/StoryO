@@ -239,6 +239,11 @@ class AddStoryView extends BaseView {
     alert(message);
   }
 
+  showSuccessAndRedirect(message, url) {
+    alert(message);
+    window.location.hash = url;
+  }
+
   cleanup() {
     this.stopCameraStream();
     if (this.map) {

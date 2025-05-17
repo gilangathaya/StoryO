@@ -28,10 +28,13 @@ class LoginPresenter extends BasePresenter {
       }
       
       // Redirect to home page
-      window.location.hash = '#/';
+      // window.location.hash = '#/'; // Removed direct navigation
       
       // Refresh the page to update UI based on login state
-      window.location.reload();
+      // window.location.reload(); // Removed direct reload
+
+      // Delegate navigation and reload to the View
+      this.view.redirectToHomeAndReload();
       
     } catch (error) {
       hideLoading();

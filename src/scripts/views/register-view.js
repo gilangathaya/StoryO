@@ -59,6 +59,11 @@ class RegisterView extends BaseView {
     const errorContainer = document.getElementById('register-error');
     errorContainer.style.display = 'none';
   }
+
+  showSuccessAndRedirectToLogin(message) {
+    alert(message);
+    window.location.hash = '#/login';
+  }
 }
 
 export default RegisterView; 

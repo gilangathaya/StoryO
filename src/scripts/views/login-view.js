@@ -53,6 +53,11 @@ class LoginView extends BaseView {
     const errorContainer = document.getElementById('login-error');
     errorContainer.style.display = 'none';
   }
+
+  redirectToHomeAndReload() {
+    window.location.hash = '#/';
+    window.location.reload();
+  }
 }
 
 export default LoginView; 
