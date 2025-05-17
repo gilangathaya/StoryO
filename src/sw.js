@@ -74,4 +74,15 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
+});
+
+self.addEventListener('push', (event) => {
+  const title = 'Push Notification';
+  const options = {
+    body: event.data.text() || 'Yay, a push message!',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/icon-192x192.png'
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
 }); 
