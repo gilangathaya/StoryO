@@ -77,9 +77,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('push', (event) => {
-  const title = 'Push Notification';
+  const data = event.data.json();
+  const title = data.title || 'Push Notification';
   const options = {
-    body: event.data.text() || 'Yay, a push message!',
+    body: data.options.body || 'Yay, a push message!',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-192x192.png'
   };
